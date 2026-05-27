@@ -2,13 +2,36 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Conversation, Message, ViewType } from "@/types";
-import Sidebar from "@/components/Sidebar";
+import TopNav from "@/components/TopNav";
 import WelcomeView from "@/components/WelcomeView";
 import ChatView from "@/components/ChatView";
 import ScheduleView from "@/components/ScheduleView";
 import AddCourseView from "@/components/AddCourseView";
 
 const STORAGE_KEY = "schedule-assistant-conversations";
+const WEEK_KEY = "schedule-assistant-current-week";
+const SEMESTER_START = new Date("2026-03-02");
+
+function getCurrentWeek(): number {
+  const now = new Date();
+  const diff = now.getTime() - SEMESTER_START.getTime();
+  const week = Math.floor(diff / (7 * 24 * 60 * 60 * 1000)) + 1;
+  return Math.max(1, Math.min(20, week));
+}
+
+function loadWeek(): number {
+  if (typeof window === "undefined") return getCurrentWeek();
+  try {
+    const raw = localStorage.getItem(WEEK_KEY);
+    if (raw) return parseInt(raw, 10);
+  } catch {}
+  return getCurrentWeek();
+}
+
+function saveWeek(week: number) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(WEEK_KEY, String(week));
+}
 
 function loadConversations(): Conversation[] {
   if (typeof window === "undefined") return [];
@@ -29,7 +52,12 @@ export default function AppPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<ViewType>("welcome");
-  const [currentWeek, setCurrentWeek] = useState(1);
+  const [currentWeek, setCurrentWeek] = useState(() => loadWeek());
+
+  const handleWeekChange = useCallback((week: number) => {
+    setCurrentWeek(week);
+    saveWeek(week);
+  }, []);
 
   useEffect(() => {
     const saved = loadConversations();
@@ -105,19 +133,20 @@ export default function AppPage() {
   }, [activeConvId, handleNewChat]);
 
   return (
-    <div className="flex h-screen">
-      <Sidebar
+    <div className="flex flex-col h-screen">
+      <TopNav
         conversations={conversations}
         activeConvId={activeConvId}
         currentView={currentView}
         currentWeek={currentWeek}
+        autoWeek={getCurrentWeek()}
         onNewChat={handleNewChat}
         onSelectConv={handleSelectConv}
         onDeleteConv={handleDeleteConv}
         onViewChange={handleViewChange}
-        onWeekChange={setCurrentWeek}
+        onWeekChange={handleWeekChange}
       />
-      <main className="flex-1 min-w-0 bg-[#0f0f0f]">
+      <main className="flex-1 min-h-0 bg-[#0f0f0f]">
         {currentView === "chat" && (
           <ChatView
             messages={activeConv?.messages || []}

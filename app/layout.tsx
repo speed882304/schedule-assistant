@@ -13,8 +13,27 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" className="dark">
-      <body className="min-h-screen bg-[#0f0f0f] text-gray-200 antialiased">
-        {children}
+      <body className="min-h-screen text-gray-200 antialiased">
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 0,
+            backgroundImage: "url('/bg.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 1,
+            backgroundColor: "rgba(15, 15, 15, 0.4)",
+          }}
+        />
+        <div style={{ position: "relative", zIndex: 10 }}>{children}</div>
       </body>
     </html>
   );

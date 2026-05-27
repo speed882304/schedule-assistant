@@ -16,6 +16,7 @@ export default function AddCourseView({ onAdded }: Props) {
     teacher: "",
     weekStart: 1,
     weekEnd: 16,
+    weekType: "all" as "all" | "odd" | "even",
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -28,7 +29,11 @@ export default function AddCourseView({ onAdded }: Props) {
     const weeks = Array.from(
       { length: form.weekEnd - form.weekStart + 1 },
       (_, i) => form.weekStart + i
-    );
+    ).filter((w) => {
+      if (form.weekType === "odd") return w % 2 === 1;
+      if (form.weekType === "even") return w % 2 === 0;
+      return true;
+    });
 
     await fetch("/api/schedule", {
       method: "POST",
@@ -46,7 +51,7 @@ export default function AddCourseView({ onAdded }: Props) {
 
     setSubmitting(false);
     setSuccess(true);
-    setForm({ name: "", day: 1, startTime: "08:00", endTime: "09:40", location: "", teacher: "", weekStart: 1, weekEnd: 16 });
+    setForm({ name: "", day: 1, startTime: "08:00", endTime: "09:40", location: "", teacher: "", weekStart: 1, weekEnd: 16, weekType: "all" });
     setTimeout(() => setSuccess(false), 3000);
     onAdded?.();
   };
@@ -167,6 +172,19 @@ export default function AddCourseView({ onAdded }: Props) {
               onChange={(e) => setForm({ ...form, weekEnd: Number(e.target.value) })}
             />
           </div>
+        </div>
+
+        <div>
+          <label className={labelClass}>周次类型</label>
+          <select
+            className={inputClass}
+            value={form.weekType}
+            onChange={(e) => setForm({ ...form, weekType: e.target.value as "all" | "odd" | "even" })}
+          >
+            <option value="all">每周</option>
+            <option value="odd">单周</option>
+            <option value="even">双周</option>
+          </select>
         </div>
 
         <button

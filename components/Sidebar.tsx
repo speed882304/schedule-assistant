@@ -9,11 +9,13 @@ interface Props {
   activeConvId: string | null;
   currentView: ViewType;
   currentWeek: number;
+  autoWeek: number;
   onNewChat: () => void;
   onSelectConv: (id: string) => void;
   onDeleteConv: (id: string) => void;
   onViewChange: (view: ViewType) => void;
   onWeekChange: (week: number) => void;
+  onClose: () => void;
 }
 
 export default function Sidebar({
@@ -21,11 +23,13 @@ export default function Sidebar({
   activeConvId,
   currentView,
   currentWeek,
+  autoWeek,
   onNewChat,
   onSelectConv,
   onDeleteConv,
   onViewChange,
   onWeekChange,
+  onClose,
 }: Props) {
   const navItems: { view: ViewType; label: string; icon: React.ReactNode }[] = [
     {
@@ -61,13 +65,21 @@ export default function Sidebar({
   ];
 
   return (
-    <aside className="w-64 h-screen bg-[#171717] border-r border-gray-800 flex flex-col shrink-0">
-      <div className="p-4 border-b border-gray-800">
+    <aside className="w-64 h-screen bg-[#171717] border-r border-gray-800 flex flex-col shrink-0 fixed inset-y-0 left-0 z-50 md:relative overflow-y-auto">
+      <div className="p-4 border-b border-gray-800 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             AI 课表助手
           </span>
         </Link>
+        <button
+          onClick={onClose}
+          className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:bg-[#1f1f1f] hover:text-gray-200 transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
       <div className="p-3">
@@ -82,7 +94,7 @@ export default function Sidebar({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 py-1">
+      <div className="flex-1 px-2 py-1 min-h-0">
         <p className="text-xs text-gray-500 px-3 py-2 uppercase tracking-wider">对话历史</p>
         <ConversationList
           conversations={conversations}
@@ -92,8 +104,8 @@ export default function Sidebar({
         />
       </div>
 
-      <div className="border-t border-gray-800 p-3">
-        <p className="text-xs text-gray-500 px-1 py-1 uppercase tracking-wider">当前周次</p>
+      <div className="border-t border-gray-800 px-3 pt-2 pb-3">
+        <p className="text-xs text-gray-500 px-1 uppercase tracking-wider">当前周次</p>
         <div className="flex items-center gap-1 mt-1">
           <button
             onClick={() => onWeekChange(Math.max(1, currentWeek - 1))}
@@ -117,6 +129,14 @@ export default function Sidebar({
             </svg>
           </button>
         </div>
+        {currentWeek !== autoWeek && (
+          <button
+            onClick={() => onWeekChange(autoWeek)}
+            className="w-full mt-2 text-xs text-blue-400 hover:text-blue-300 transition-colors py-1"
+          >
+            回到本周（第 {autoWeek} 周）
+          </button>
+        )}
       </div>
 
       <div className="border-t border-gray-800 p-3 space-y-1">

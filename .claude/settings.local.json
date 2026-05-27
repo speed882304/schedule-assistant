@@ -15,7 +15,16 @@
       "Bash(npx tsc *)",
       "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('data/schedule.json','utf-8'\\)\\); console.log\\('Valid JSON'\\)\")",
       "Bash(netstat -ano)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(npx next *)",
+      "Bash(ipconfig)",
+      "Bash(awk '{print $NF}')",
+      "Bash(awk '{print $5}')",
+      "Bash(curl -s http://localhost:3003/)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl *)",
+      "Bash(taskkill *)",
+      "Bash(gh auth *)"
     ]
   }
 }
