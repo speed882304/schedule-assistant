@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { Course, DAY_LABELS, COURSE_COLORS } from "@/types";
 
-export default function ScheduleView() {
+interface Props {
+  currentWeek: number;
+}
+
+export default function ScheduleView({ currentWeek }: Props) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,6 +20,8 @@ export default function ScheduleView() {
       })
       .catch(() => setLoading(false));
   }, []);
+
+  const weekCourses = courses.filter((c) => c.weeks.includes(currentWeek));
 
   const getColor = (name: string) => {
     let hash = 0;
@@ -49,7 +55,7 @@ export default function ScheduleView() {
       <h2 className="text-2xl font-bold mb-6">课程表</h2>
       <div className="space-y-6 max-w-3xl">
         {days.map((day) => {
-          const dayCourses = courses
+          const dayCourses = weekCourses
             .filter((c) => c.day === day)
             .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
@@ -101,6 +107,9 @@ export default function ScheduleView() {
         })}
         {courses.length === 0 && (
           <p className="text-gray-500 text-center py-20">暂无课程，点击侧边栏&ldquo;添加课程&rdquo;开始</p>
+        )}
+        {courses.length > 0 && weekCourses.length === 0 && (
+          <p className="text-gray-500 text-center py-20">第 {currentWeek} 周没有课程安排</p>
         )}
       </div>
     </div>

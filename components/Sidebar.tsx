@@ -8,20 +8,24 @@ interface Props {
   conversations: Conversation[];
   activeConvId: string | null;
   currentView: ViewType;
+  currentWeek: number;
   onNewChat: () => void;
   onSelectConv: (id: string) => void;
   onDeleteConv: (id: string) => void;
   onViewChange: (view: ViewType) => void;
+  onWeekChange: (week: number) => void;
 }
 
 export default function Sidebar({
   conversations,
   activeConvId,
   currentView,
+  currentWeek,
   onNewChat,
   onSelectConv,
   onDeleteConv,
   onViewChange,
+  onWeekChange,
 }: Props) {
   const navItems: { view: ViewType; label: string; icon: React.ReactNode }[] = [
     {
@@ -86,6 +90,33 @@ export default function Sidebar({
           onSelect={onSelectConv}
           onDelete={onDeleteConv}
         />
+      </div>
+
+      <div className="border-t border-gray-800 p-3">
+        <p className="text-xs text-gray-500 px-1 py-1 uppercase tracking-wider">当前周次</p>
+        <div className="flex items-center gap-1 mt-1">
+          <button
+            onClick={() => onWeekChange(Math.max(1, currentWeek - 1))}
+            disabled={currentWeek <= 1}
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-[#1f1f1f] hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div className="flex-1 text-center">
+            <span className="text-lg font-semibold text-gray-100">第 {currentWeek} 周</span>
+          </div>
+          <button
+            onClick={() => onWeekChange(Math.min(20, currentWeek + 1))}
+            disabled={currentWeek >= 20}
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-[#1f1f1f] hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="border-t border-gray-800 p-3 space-y-1">

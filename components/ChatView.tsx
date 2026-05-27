@@ -8,9 +8,10 @@ import ChatInput from "./ChatInput";
 interface Props {
   messages: Message[];
   onMessagesUpdate: (messages: Message[]) => void;
+  currentWeek: number;
 }
 
-export default function ChatView({ messages, onMessagesUpdate }: Props) {
+export default function ChatView({ messages, onMessagesUpdate, currentWeek }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -31,7 +32,7 @@ export default function ChatView({ messages, onMessagesUpdate }: Props) {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedMessages }),
+        body: JSON.stringify({ messages: updatedMessages, currentWeek }),
         signal: abortRef.current.signal,
       });
 

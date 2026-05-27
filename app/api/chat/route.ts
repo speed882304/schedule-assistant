@@ -4,10 +4,21 @@ import { readSchedule } from "@/lib/schedule";
 import { Message } from "@/types";
 
 export async function POST(request: NextRequest) {
-  const { messages } = (await request.json()) as { messages: Message[] };
+  const { messages, currentWeek } = (await request.json()) as {
+    messages: Message[];
+    currentWeek?: number;
+  };
 
-  const scheduleData = JSON.stringify(readSchedule(), null, 2);
-  const systemPrompt = SYSTEM_PROMPT.replace("{SCHEDULE_DATA}", scheduleData);
+  const allCourses = readSchedule();
+  const weekCourses = currentWeek
+    ? allCourses.filter((c) => c.weeks.includes(currentWeek))
+    : allCourses;
+  const scheduleData = JSON.stringify(weekCourses, null, 2);
+  const weekHint = currentWeek ? `\n当前是第 ${currentWeek} 周。` : "";
+  const systemPrompt = SYSTEM_PROMPT.replace("{SCHEDULE_DATA}", scheduleData).replace(
+    "{WEEK_HINT}",
+    weekHint
+  );
 
   const anthropicMessages = messages.map((m) => ({
     role: m.role as "user" | "assistant",

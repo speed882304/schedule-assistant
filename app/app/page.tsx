@@ -21,6 +21,7 @@ function loadConversations(): Conversation[] {
 }
 
 function saveConversations(convs: Conversation[]) {
+  if (typeof window === "undefined") return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(convs));
 }
 
@@ -28,11 +29,13 @@ export default function AppPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<ViewType>("welcome");
-  const [mounted, setMounted] = useState(false);
+  const [currentWeek, setCurrentWeek] = useState(1);
 
   useEffect(() => {
-    setConversations(loadConversations());
-    setMounted(true);
+    const saved = loadConversations();
+    if (saved.length > 0) {
+      setConversations(saved);
+    }
   }, []);
 
   const activeConv = conversations.find((c) => c.id === activeConvId) || null;
@@ -101,38 +104,31 @@ export default function AppPage() {
     }
   }, [activeConvId, handleNewChat]);
 
-  if (!mounted) return null;
-
-  const renderMainContent = () => {
-    switch (currentView) {
-      case "chat":
-        return (
-          <ChatView
-            messages={activeConv?.messages || []}
-            onMessagesUpdate={handleMessagesUpdate}
-          />
-        );
-      case "schedule":
-        return <ScheduleView />;
-      case "add-course":
-        return <AddCourseView />;
-      default:
-        return <WelcomeView onStart={handleWelcomeStart} />;
-    }
-  };
-
   return (
     <div className="flex h-screen">
       <Sidebar
         conversations={conversations}
         activeConvId={activeConvId}
         currentView={currentView}
+        currentWeek={currentWeek}
         onNewChat={handleNewChat}
         onSelectConv={handleSelectConv}
         onDeleteConv={handleDeleteConv}
         onViewChange={handleViewChange}
+        onWeekChange={setCurrentWeek}
       />
-      <main className="flex-1 min-w-0 bg-[#0f0f0f]">{renderMainContent()}</main>
+      <main className="flex-1 min-w-0 bg-[#0f0f0f]">
+        {currentView === "chat" && (
+          <ChatView
+            messages={activeConv?.messages || []}
+            onMessagesUpdate={handleMessagesUpdate}
+            currentWeek={currentWeek}
+          />
+        )}
+        {currentView === "schedule" && <ScheduleView currentWeek={currentWeek} />}
+        {currentView === "add-course" && <AddCourseView />}
+        {currentView === "welcome" && <WelcomeView onStart={handleWelcomeStart} />}
+      </main>
     </div>
   );
 }
