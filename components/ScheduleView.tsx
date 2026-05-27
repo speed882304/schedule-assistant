@@ -100,7 +100,7 @@ export default function ScheduleView() {
           );
         })}
         {courses.length === 0 && (
-          <p className="text-gray-500 text-center py-20">暂无课程，点击侧边栏"添加课程"开始</p>
+          <p className="text-gray-500 text-center py-20">暂无课程，点击侧边栏&ldquo;添加课程&rdquo;开始</p>
         )}
       </div>
     </div>
