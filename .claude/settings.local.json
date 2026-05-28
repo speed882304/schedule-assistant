@@ -33,7 +33,10 @@
       "Bash(where gh *)",
       "Bash(winget install *)",
       "Bash(gh --version)",
-      "Bash(gh-cli --version)"
+      "Bash(gh-cli --version)",
+      "Bash(npx railway *)",
+      "Bash(railway login *)",
+      "Bash(npx localtunnel *)"
     ]
   }
 }

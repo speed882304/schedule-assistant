@@ -33,23 +33,21 @@ async function handleRequest(request, env) {
     .replace("{SCHEDULE_DATA}", scheduleData || "[]")
     .replace("{WEEK_HINT}", weekHint || "");
 
-  const anthropicMessages = messages.map((m) => ({
-    role: m.role,
-    content: m.content,
-  }));
+  const deepseekMessages = [
+    { role: "system", content: systemPrompt },
+    ...messages.map((m) => ({ role: m.role, content: m.content })),
+  ];
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("https://api.deepseek.com/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
+      "Authorization": `Bearer ${env.DEEPSEEK_API_KEY}`,
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-6",
+      model: "deepseek-chat",
       max_tokens: 2048,
-      system: systemPrompt,
-      messages: anthropicMessages,
+      messages: deepseekMessages,
       stream: true,
     }),
   });

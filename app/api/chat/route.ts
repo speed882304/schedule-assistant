@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getAnthropicClient, SYSTEM_PROMPT } from "@/lib/anthropic";
+import { getDeepSeekClient, SYSTEM_PROMPT } from "@/lib/deepseek";
 import { readSchedule } from "@/lib/schedule";
 import { Message } from "@/types";
 
@@ -20,19 +20,38 @@ export async function POST(request: NextRequest) {
     weekHint
   );
 
-  const anthropicMessages = messages.map((m) => ({
-    role: m.role as "user" | "assistant",
-    content: m.content,
-  }));
+  const deepseekMessages = [
+    { role: "system" as const, content: systemPrompt },
+    ...messages.map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.content,
+    })),
+  ];
 
-  const stream = await getAnthropicClient().messages.stream({
-    model: "claude-sonnet-4-6",
+  const stream = await getDeepSeekClient().chat.completions.create({
+    model: "deepseek-chat",
     max_tokens: 2048,
-    system: systemPrompt,
-    messages: anthropicMessages,
+    messages: deepseekMessages,
+    stream: true,
   });
 
-  return new Response(stream.toReadableStream(), {
+  const encoder = new TextEncoder();
+  const readable = new ReadableStream({
+    async start(controller) {
+      for await (const chunk of stream) {
+        const text = chunk.choices[0]?.delta?.content;
+        if (text) {
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ delta: { text } })}\n\n`)
+          );
+        }
+      }
+      controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+      controller.close();
+    },
+  });
+
+  return new Response(readable, {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",

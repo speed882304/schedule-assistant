@@ -74,8 +74,9 @@ export default function ChatView({ messages, onMessagesUpdate, currentWeek }: Pr
           if (data === "[DONE]") continue;
           try {
             const parsed = JSON.parse(data);
-            if (parsed.type === "content_block_delta" && parsed.delta?.text) {
-              aiContent += parsed.delta.text;
+            const text = parsed.delta?.text;
+            if (text) {
+              aiContent += text;
               const msgs = [...updatedMessages, { role: "assistant" as const, content: aiContent }];
               onMessagesUpdate(msgs);
             }
