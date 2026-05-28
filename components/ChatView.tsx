@@ -4,6 +4,10 @@ import { useState, useRef, useEffect } from "react";
 import { Message } from "@/types";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
+import { loadSchedule } from "@/lib/schedule-client";
+
+const API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL || "/api/chat";
+const IS_WORKER = !!process.env.NEXT_PUBLIC_CHAT_API_URL;
 
 interface Props {
   messages: Message[];
@@ -28,11 +32,24 @@ export default function ChatView({ messages, onMessagesUpdate, currentWeek }: Pr
     setIsLoading(true);
     abortRef.current = new AbortController();
 
+    const buildBody = () => {
+      if (IS_WORKER) {
+        const courses = loadSchedule();
+        const weekCourses = courses.filter((c) => c.weeks.includes(currentWeek));
+        return JSON.stringify({
+          messages: updatedMessages,
+          scheduleData: JSON.stringify(weekCourses),
+          weekHint: `当前是第 ${currentWeek} 周。`,
+        });
+      }
+      return JSON.stringify({ messages: updatedMessages, currentWeek });
+    };
+
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedMessages, currentWeek }),
+        body: buildBody(),
         signal: abortRef.current.signal,
       });
 

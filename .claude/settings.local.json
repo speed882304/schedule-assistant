@@ -24,7 +24,16 @@
       "Bash(curl -s http://localhost:3000/)",
       "Bash(curl *)",
       "Bash(taskkill *)",
-      "Bash(gh auth *)"
+      "Bash(gh auth *)",
+      "Bash(npx vercel *)",
+      "Bash(rm -rf app/_api_bak)",
+      "Bash(cp -r app/api app/_api_bak)",
+      "Bash(rm -rf app/api)",
+      "Bash(npx wrangler *)",
+      "Bash(where gh *)",
+      "Bash(winget install *)",
+      "Bash(gh --version)",
+      "Bash(gh-cli --version)"
     ]
   }
 }

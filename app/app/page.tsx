@@ -7,6 +7,7 @@ import WelcomeView from "@/components/WelcomeView";
 import ChatView from "@/components/ChatView";
 import ScheduleView from "@/components/ScheduleView";
 import AddCourseView from "@/components/AddCourseView";
+import { seedIfEmpty } from "@/lib/schedule-client";
 
 const STORAGE_KEY = "schedule-assistant-conversations";
 const WEEK_KEY = "schedule-assistant-current-week";
@@ -60,6 +61,7 @@ export default function AppPage() {
   }, []);
 
   useEffect(() => {
+    seedIfEmpty();
     const saved = loadConversations();
     if (saved.length > 0) {
       setConversations(saved);

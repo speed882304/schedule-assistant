@@ -13,6 +13,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" className="dark">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="课表助手" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+      </head>
       <body className="min-h-screen text-gray-200 antialiased">
         <div
           style={{
@@ -34,6 +42,15 @@ export default function RootLayout({
           }}
         />
         <div style={{ position: "relative", zIndex: 10 }}>{children}</div>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.register("/sw.js");
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

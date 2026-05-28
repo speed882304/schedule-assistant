@@ -6,6 +6,7 @@
     "dev": "next dev -H 0.0.0.0",
     "dev:clean": "npx kill-port 3000 && next dev -H 0.0.0.0",
     "build": "next build",
+    "build:static": "node scripts/build-static.js",
     "start": "next start",
     "lint": "next lint"
   },

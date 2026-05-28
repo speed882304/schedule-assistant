@@ -1,0 +1,6 @@
+name = "schedule-assistant-api"
+main = "index.js"
+compatibility_date = "2025-05-28"
+
+[vars]
+# 部署后在这里设置: npx wrangler secret put ANTHROPIC_API_KEY

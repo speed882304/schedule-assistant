@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { Course, COURSE_COLORS } from "@/types";
+import { loadSchedule, deleteCourse } from "@/lib/schedule-client";
 
 interface Props {
   currentWeek: number;
@@ -18,13 +19,8 @@ export default function ScheduleView({ currentWeek }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/schedule")
-      .then((r) => r.json())
-      .then((data) => {
-        setCourses(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    setCourses(loadSchedule());
+    setLoading(false);
   }, []);
 
   const weekCourses = courses.filter((c) => c.weeks.includes(currentWeek));
@@ -37,8 +33,8 @@ export default function ScheduleView({ currentWeek }: Props) {
     return COURSE_COLORS[Math.abs(hash) % COURSE_COLORS.length];
   };
 
-  const handleDelete = async (id: string) => {
-    await fetch(`/api/schedule/${id}`, { method: "DELETE" });
+  const handleDelete = (id: string) => {
+    deleteCourse(id);
     setCourses((prev) => prev.filter((c) => c.id !== id));
   };
 

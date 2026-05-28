@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { addCourse } from "@/lib/schedule-client";
 
 interface Props {
   onAdded?: () => void;
@@ -21,7 +22,7 @@ export default function AddCourseView({ onAdded }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setSuccess(false);
@@ -35,18 +36,15 @@ export default function AddCourseView({ onAdded }: Props) {
       return true;
     });
 
-    await fetch("/api/schedule", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: form.name,
-        day: form.day,
-        startTime: form.startTime,
-        endTime: form.endTime,
-        location: form.location,
-        teacher: form.teacher,
-        weeks,
-      }),
+    addCourse({
+      id: Date.now().toString(),
+      name: form.name,
+      day: form.day,
+      startTime: form.startTime,
+      endTime: form.endTime,
+      location: form.location,
+      teacher: form.teacher,
+      weeks,
     });
 
     setSubmitting(false);
